@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Chatbot SaaS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Theme Toggle -->
+<button class="btn btn-sm btn-outline-secondary position-fixed top-0 end-0 m-3" id="themeToggle" style="z-index: 1050;">
+    <i class="fas fa-moon" id="themeIcon"></i>
+</button>
+
+<!-- Toast Container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11; margin-top: 60px;">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Operation completed successfully!
+        </div>
+    </div>
+    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="errorToastBody">
+            An error occurred.
+        </div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#"><i class="fas fa-robot me-2"></i>Chatbot SaaS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#profile"><i class="fas fa-user me-1"></i>Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#knowledge-bases"><i class="fas fa-database me-1"></i>Knowledge Bases</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">Welcome back, <span id="userName">User</span>!</h1>
+            <p class="lead text-muted">Manage your chatbot knowledge bases and profile settings</p>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="row mb-4" id="profile">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Name:</strong> <span id="userFullName">Loading...</span></p>
+                            <p class="mb-2"><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Subscription Plan:</strong> 
+                                <span id="userPlan" class="badge bg-success">Loading...</span>
+                                <button class="btn btn-sm btn-outline-primary ms-2" onclick="showUpgradeModal()">
+                                    <i class="fas fa-arrow-up"></i> Upgrade
+                                </button>
+                            </p>
+                            <p class="mb-2"><strong>Subscription Ends:</strong> <span id="subscriptionEnd" class="badge bg-warning text-dark">Loading...</span></p>
+                            <p class="mb-2"><strong>Member Since:</strong> <span id="memberSince">Loading...</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Embed Code Section -->
+    <div class="row mb-4" id="embedCodeSection" style="display:none;">
+        <div class="col-12">
+            <div class="alert alert-info d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-code me-2"></i>
+                    <strong>Embed Code:</strong> <code id="embedCode"></code>
+                </div>
+                <button class="btn btn-sm btn-primary" onclick="copyEmbedCode()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Knowledge Bases Section -->
+    <div class="row mb-4" id="knowledge-bases">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3><i class="fas fa-database me-2"></i>Knowledge Bases</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addKBModal">
+                    <i class="fas fa-plus me-2"></i>Add New
+                </button>
+            </div>
+            <div class="row g-4" id="kbList">
+                <!-- Knowledge base cards will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Knowledge Base Modal -->
+<div class="modal fade" id="addKBModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Add Knowledge Base</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addKBForm">
+                    <div class="mb-3">
+                        <label for="kbName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="kbName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="kbType" class="form-label">Type</label>
+                        <select class="form-select" id="kbType" required>
+                            <option value="url">Website URL</option>
+                            <option value="document">Document Upload</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="urlField">
+                        <label for="kbURL" class="form-label">Website URL</label>
+                        <input type="url" class="form-control" id="kbURL" placeholder="https://example.com">
+                    </div>
+                <div class="mb-3" id="fileField" style="display:none;">
+                    <label for="kbFile" class="form-label">Upload Document</label>
+                    <input type="file" class="form-control" id="kbFile" accept=".pdf,.doc,.docx,.txt,.md,.csv,.xls,.xlsx">
+                    <small class="text-muted">Supported formats: PDF, Word, Text, Markdown, CSV, Excel</small>
+                </div>
+                    <!-- Progress Bar -->
+                    <div class="progress mb-3" id="uploadProgress" style="display:none;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-plus me-2"></i>Add Knowledge Base
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this knowledge base? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="fas fa-trash me-2"></i>Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upgrade Plan Modal -->
+<div class="modal fade" id="upgradeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-arrow-up me-2"></i>Upgrade Your Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4" id="plansList">
+                    <!-- Plans will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmUpgrade" disabled>
+                    <i class="fas fa-credit-card me-2"></i>Proceed to Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/utils.js"></script>
+<script>
+// Global variables
+let currentKBId = null;
+let deleteModal = null;
+let currentPlan = null;
+let selectedPlan = null;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is authenticated
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        // Redirect to home page with message
+        window.location.href = '/?auth=required';
+        return;
+    }
+    
+    deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    
+    // Check for payment success parameter
+    checkPaymentStatus();
+    
+    loadDashboard();
+    initializeTheme();
+});
+
+// Theme toggle functionality
+function initializeTheme() {
+    const theme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', theme);
+    updateThemeIcon(theme);
+}
+
+document.getElementById('themeToggle').onclick = function() {
+    const currentTheme = document.body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+};
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('themeIcon');
+    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
+
+// Logout functionality
+document.getElementById('logoutBtn').onclick = function() {
+    localStorage.removeItem('access_token');
+    window.location.href = '/';
+};
+
+// Toggle between URL and Document fields
+document.getElementById('kbType').onchange = function() {
+    const type = this.value;
+    document.getElementById('urlField').style.display = type === 'url' ? 'block' : 'none';
+    document.getElementById('fileField').style.display = type === 'document' ? 'block' : 'none';
+};
+
+// Copy embed code
+function copyEmbedCode() {
+    const embedCode = document.getElementById('embedCode').innerText;
+    navigator.clipboard.writeText(embedCode).then(() => {
+        showToast('success', 'Embed code copied to clipboard!');
+    });
+}
+
+// Show toast notification
+function showToast(type, message) {
+    const toastEl = document.getElementById(type + 'Toast');
+    if (type === 'error') {
+        document.getElementById('errorToastBody').innerText = message;
+    } else {
+        toastEl.querySelector('.toast-body').innerText = message;
+    }
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+}
+
+// Check for payment success/cancel
+function checkPaymentStatus() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const sessionId = urlParams.get('session_id');
+    
+    if (paymentStatus === 'success') {
+        showToast('success', 'Payment successful! Your subscription has been upgraded.');
+        // Clean up the URL while preserving the correct path
+        window.history.replaceState({}, document.title, '/dashboard.html');
+        // Force reload dashboard data to show updated plan
+        setTimeout(() => {
+            loadDashboard();
+        }, 1000);
+    } else if (paymentStatus === 'cancelled') {
+        showToast('error', 'Payment was cancelled. You can try again anytime.');
+        // Clean up the URL while preserving the correct path
+        window.history.replaceState({}, document.title, '/dashboard.html');
+    }
+}
+
+// Load dashboard data
+async function loadDashboard() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        window.location.href = '/?auth=required';
+        return;
+    }
+    
+    try {
+        const response = await fetch('/dashboard/data', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Token is invalid or expired
+                localStorage.removeItem('access_token');
+                window.location.href = '/?auth=expired';
+                return;
+            }
+            throw new Error('Failed to load dashboard data');
+        }
+
+        const data = await response.json();
+        
+        // Update user info
+        document.getElementById('userName').innerText = data.user_info?.name || 'User';
+        document.getElementById('userFullName').innerText = data.user_info?.name || 'N/A';
+        document.getElementById('userEmail').innerText = data.user_info?.email || 'N/A';
+        document.getElementById('userPlan').innerText = data.user_info?.subscription || 'Free';
+        
+        // Store current plan for upgrade modal
+        currentPlan = data.user_info?.subscription || 'Freemium';
+        
+        // Update subscription end date
+        if (data.plan_details?.end_date) {
+            const endDate = new Date(data.plan_details.end_date);
+            const today = new Date();
+            const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+            const endDateStr = endDate.toLocaleDateString();
+            
+            if (daysLeft <= 0) {
+                document.getElementById('subscriptionEnd').innerText = `Expired on ${endDateStr}`;
+                document.getElementById('subscriptionEnd').className = 'badge bg-danger';
+            } else if (daysLeft <= 7) {
+                document.getElementById('subscriptionEnd').innerText = `${endDateStr} (${daysLeft} days left)`;
+                document.getElementById('subscriptionEnd').className = 'badge bg-warning text-dark';
+            } else {
+                document.getElementById('subscriptionEnd').innerText = endDateStr;
+                document.getElementById('subscriptionEnd').className = 'badge bg-info text-dark';
+            }
+        } else {
+            document.getElementById('subscriptionEnd').innerText = 'N/A';
+            document.getElementById('subscriptionEnd').className = 'badge bg-secondary';
+        }
+        
+        document.getElementById('memberSince').innerText = data.user_info?.created_at ? 
+            new Date(data.user_info.created_at).toLocaleDateString() : 'N/A';
+        
+        // Update embed code
+        if (data.embed_code) {
+            document.getElementById('embedCode').innerText = data.embed_code;
+            document.getElementById('embedCodeSection').style.display = 'block';
+        }
+        
+        // Update knowledge bases
+        renderKnowledgeBases(data.knowledge_bases || []);
+    } catch (error) {
+        showToast('error', error.message);
+    }
+}
+
+// Render knowledge bases as cards
+function renderKnowledgeBases(knowledgeBases) {
+    const kbList = document.getElementById('kbList');
+    kbList.innerHTML = '';
+    
+    if (knowledgeBases.length === 0) {
+        kbList.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-database fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No knowledge bases yet. Click "Add New" to get started!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    knowledgeBases.forEach(kb => {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4';
+        
+        const icon = kb.type === 'url' ? 'fa-globe' : 'fa-file-alt';
+        const typeLabel = kb.type === 'url' ? 'Website' : 'Document';
+        const uploadDate = kb.created_at ? new Date(kb.created_at).toLocaleDateString() : 'Unknown';
+        
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm kb-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas ${icon} fa-2x text-primary me-3"></i>
+                            <div>
+                                <h5 class="card-title mb-1">${kb.name}</h5>
+                                <small class="text-muted">${typeLabel}</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" onclick="deleteKB('${kb.id}', '${kb.name}')">
+                                        <i class="fas fa-trash me-2"></i>Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>Uploaded: ${uploadDate}
+                        </small>
+                    </p>
+                    ${kb.source_url ? `<p class="card-text"><small class="text-muted"><i class="fas fa-link me-1"></i>${kb.source_url}</small></p>` : ''}
+                </div>
+            </div>
+        `;
+        
+        kbList.appendChild(col);
+    });
+}
+
+// Delete knowledge base
+function deleteKB(id, name) {
+    currentKBId = id;
+    document.querySelector('#deleteModal .modal-body p').innerText = 
+        `Are you sure you want to delete "${name}"? This action cannot be undone.`;
+    deleteModal.show();
+}
+
+document.getElementById('confirmDelete').onclick = async function() {
+    if (!currentKBId) return;
+    
+    const token = localStorage.getItem('access_token');
+    try {
+        const response = await fetch(`/knowledgebase/delete/${currentKBId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete knowledge base');
+        }
+        
+        deleteModal.hide();
+        showToast('success', 'Knowledge base deleted successfully!');
+        loadDashboard(); // Reload data
+    } catch (error) {
+        showToast('error', error.message);
+    }
+};
+
+// Handle knowledge base form submission
+document.getElementById('addKBForm').onsubmit = async function(e) {
+    e.preventDefault();
+    
+    const token = localStorage.getItem('access_token');
+    const name = document.getElementById('kbName').value;
+    const type = document.getElementById('kbType').value;
+    const progressBar = document.querySelector('#uploadProgress .progress-bar');
+    const progressContainer = document.getElementById('uploadProgress');
+    
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('type', type);
+    
+    if (type === 'url') {
+        const url = document.getElementById('kbURL').value;
+        if (!url) {
+            showToast('error', 'Please enter a URL');
+            return;
+        }
+        formData.append('source_url', url);
+    } else {
+        const fileInput = document.getElementById('kbFile');
+        if (!fileInput.files[0]) {
+            showToast('error', 'Please select a file');
+            return;
+        }
+        formData.append('file', fileInput.files[0]);
+    }
+    
+    // Show progress bar
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    
+    // Simulate progress
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += 10;
+        progressBar.style.width = progress + '%';
+        if (progress >= 90) {
+            clearInterval(progressInterval);
+        }
+    }, 500);
+
+    // Start processing simulation
+    progressContainer.style.display = 'block';
+
+    setTimeout(() => {
+        progressBar.style.width = '100%';
+        setTimeout(() => {
+            progressContainer.style.display = 'none';
+            showToast('success', 'Knowledge base processing completed!');
+            loadDashboard();
+        }, 500);
+    }, 5000);
+    
+    try {
+        const response = await fetch('/knowledgebase/add', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+        
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+        
+        if (!response.ok) {
+            const error = await response.json();
+            const errorDetail = error.detail || 'Failed to add knowledge base';
+            
+            // Check if this is an upgrade required error
+            if (typeof errorDetail === 'string' && errorDetail.startsWith('upgrade_required:')) {
+                // Parse the error format: upgrade_required:type:message
+                const parts = errorDetail.split(':');
+                const upgradeType = parts[1] || 'general';
+                const message = parts.slice(2).join(':') || 'You need to upgrade your plan to access this feature.';
+                
+                // Hide the add KB modal first
+                bootstrap.Modal.getInstance(document.getElementById('addKBModal')).hide();
+                
+                // Show upgrade modal with custom message
+                showUpgradeModalWithMessage(message);
+                
+                // Don't throw error, we've handled it
+                progressContainer.style.display = 'none';
+                return;
+            }
+            
+            throw new Error(errorDetail);
+        }
+        
+        const result = await response.json();
+        
+        // Close modal and show success
+        bootstrap.Modal.getInstance(document.getElementById('addKBModal')).hide();
+        showToast('success', 'Knowledge base added successfully!');
+        
+        // Reset form
+        document.getElementById('addKBForm').reset();
+        progressContainer.style.display = 'none';
+        
+        // Reload dashboard
+        loadDashboard();
+    } catch (error) {
+        clearInterval(progressInterval);
+        progressContainer.style.display = 'none';
+        showToast('error', error.message);
+    }
+};
+
+// Show upgrade modal
+function showUpgradeModal() {
+    loadPlans();
+    const upgradeModal = new bootstrap.Modal(document.getElementById('upgradeModal'));
+    upgradeModal.show();
+}
+
+// Show upgrade modal with a custom message
+function showUpgradeModalWithMessage(message) {
+    // Create or update message element
+    let messageEl = document.getElementById('upgradeRequiredMessage');
+    if (!messageEl) {
+        messageEl = document.createElement('div');
+        messageEl.id = 'upgradeRequiredMessage';
+        messageEl.className = 'alert alert-info mb-3';
+        const modalBody = document.querySelector('#upgradeModal .modal-body');
+        modalBody.insertBefore(messageEl, modalBody.firstChild);
+    }
+    
+    messageEl.innerHTML = `
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Upgrade Required</strong><br>
+        ${message}
+    `;
+    
+    // Load plans and show modal
+    loadPlans();
+    const upgradeModal = new bootstrap.Modal(document.getElementById('upgradeModal'));
+    upgradeModal.show();
+    
+    // Remove message after modal is closed
+    document.getElementById('upgradeModal').addEventListener('hidden.bs.modal', function () {
+        if (messageEl) {
+            messageEl.remove();
+        }
+    }, { once: true });
+}
+
+// Load available plans
+async function loadPlans() {
+    try {
+        const response = await fetch('/clients/plans');
+        
+        if (!response.ok) {
+            throw new Error('Failed to load plans');
+        }
+        
+        const plans = await response.json();
+        renderPlansForUpgrade(plans);
+    } catch (error) {
+        showToast('error', error.message);
+    }
+}
+
+// Render plans in upgrade modal
+async function renderPlansForUpgrade(plans) {
+    const plansList = document.getElementById('plansList');
+    plansList.innerHTML = '';
+    
+    // Reset selected plan
+    selectedPlan = null;
+    document.getElementById('confirmUpgrade').disabled = true;
+    
+    // Get user's location info (always USD now)
+    const locationInfo = await getUserLocation();
+    const isIndian = false; // Force USD only
+    
+    // Sort plans by price
+    plans.sort((a, b) => a.price - b.price);
+    
+    plans.forEach(plan => {
+        if (plan.name === 'Freemium') return; // Skip freemium in upgrade modal
+        
+        // Get formatted price using utility function
+        const formattedPrice = formatPrice(plan.price, isIndian);
+        
+        const col = document.createElement('div');
+        col.className = 'col-md-4';
+        
+        const isCurrentPlan = currentPlan === plan.name;
+        
+        // Build feature list
+        let featureList = '';
+        
+        // Website feature
+        if (plan.max_sites === -1) {
+            featureList += '<li><i class="fas fa-check text-success me-2"></i><strong>Unlimited</strong> websites</li>';
+        } else {
+            featureList += `<li><i class="fas fa-check text-success me-2"></i><strong>${plan.max_sites}</strong> website${plan.max_sites > 1 ? 's' : ''}</li>`;
+        }
+        
+        // Document feature
+        if (plan.max_documents > 0) {
+            featureList += `<li><i class="fas fa-check text-success me-2"></i>Up to <strong>${plan.max_documents}</strong> documents</li>`;
+        } else if (!plan.can_upload_docs) {
+            featureList += '<li><i class="fas fa-times text-muted me-2"></i>No document uploads</li>';
+        }
+        
+        // Voice feature
+        if (plan.can_use_voice) {
+            featureList += '<li><i class="fas fa-check text-success me-2"></i><strong>Voice input</strong> enabled</li>';
+        } else {
+            featureList += '<li><i class="fas fa-times text-muted me-2"></i>Voice input</li>';
+        }
+        
+        // Messages (only show if limited)
+        if (plan.max_messages !== -1) {
+            featureList += `<li><i class="fas fa-check text-success me-2"></i>${plan.max_messages} messages/month</li>`;
+        } else {
+            featureList += '<li><i class="fas fa-check text-success me-2"></i><strong>Unlimited</strong> messages</li>';
+        }
+        
+        // Chat history
+        if (plan.chat_history_days) {
+            featureList += `<li><i class="fas fa-check text-success me-2"></i>${plan.chat_history_days}-day chat history</li>`;
+        }
+        
+        // Branding
+        if (plan.branding_removed) {
+            featureList += '<li><i class="fas fa-check text-success me-2"></i>White-label (no branding)</li>';
+        }
+        
+        // API access
+        if (plan.api_access) {
+            featureList += '<li><i class="fas fa-check text-success me-2"></i>API access</li>';
+        }
+        
+        col.innerHTML = `
+            <div class="card h-100 plan-card ${isCurrentPlan ? 'current-plan' : ''}" data-plan-id="${plan.id}" data-plan-name="${plan.name}" onclick="selectPlanCard(this, '${plan.id}', '${plan.name}')">
+                ${isCurrentPlan ? '<div class="position-absolute top-0 end-0 m-2"><span class="badge bg-info">Current</span></div>' : ''}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">${plan.name}</h5>
+                    <h3 class="mb-3">${formattedPrice}<small class="text-muted">/month</small></h3>
+                    <p class="card-text">${plan.description || ''}</p>
+                    <ul class="list-unstyled mb-4">
+                        ${featureList}
+                    </ul>
+                    <div class="mt-auto text-center">
+                        ${isCurrentPlan ? 
+                            '<span class="text-muted"><i class="fas fa-check-circle me-2"></i>Your Current Plan</span>' : 
+                            '<span class="select-indicator"><i class="fas fa-circle-notch me-2"></i>Click to Select</span>'
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        plansList.appendChild(col);
+    });
+}
+
+// Select a plan card
+function selectPlanCard(cardElement, planId, planName) {
+    // Don't allow selecting current plan
+    if (currentPlan === planName) {
+        return;
+    }
+    
+    // Remove active class from all cards
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.classList.remove('active', 'border-primary', 'shadow');
+    });
+    
+    // Add active class to selected card
+    cardElement.classList.add('active', 'border-primary', 'shadow');
+    
+    // Update selected plan
+    selectedPlan = { id: planId, name: planName };
+    
+    // Enable upgrade button
+    const upgradeBtn = document.getElementById('confirmUpgrade');
+    upgradeBtn.disabled = false;
+    upgradeBtn.innerHTML = `<i class="fas fa-credit-card me-2"></i>Upgrade to ${planName}`;
+    
+    // Update select indicator
+    document.querySelectorAll('.select-indicator').forEach(indicator => {
+        indicator.innerHTML = '<i class="fas fa-circle-notch me-2"></i>Click to Select';
+    });
+    const selectedIndicator = cardElement.querySelector('.select-indicator');
+    if (selectedIndicator) {
+        selectedIndicator.innerHTML = '<i class="fas fa-check-circle me-2 text-primary"></i>Selected';
+    }
+}
+
+// Handle upgrade button click
+document.getElementById('confirmUpgrade').onclick = async function() {
+    if (!selectedPlan) {
+        showToast('error', 'Please select a plan first');
+        return;
+    }
+    
+    const token = localStorage.getItem('access_token');
+    
+    // Show loading state
+    const btn = this;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating checkout session...';
+    
+    try {
+        const response = await fetch('/payments/create-checkout-session', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                plan_id: selectedPlan.id,
+                plan_name: selectedPlan.name 
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to create checkout session');
+        }
+        
+        const data = await response.json();
+        
+        if (data.checkout_url) {
+            // Redirect to Stripe Checkout
+            window.location.href = data.checkout_url;
+        } else {
+            throw new Error('No checkout URL received');
+        }
+    } catch (error) {
+        showToast('error', error.message);
+        // Reset button
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+};
+</script>
+</body>
+</html>

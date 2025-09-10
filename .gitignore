@@ -1,0 +1,23 @@
+.env
+backend/.env
+# environment files
+backend/.env
+.env
+.env.* 
+
+# keys & certs
+*.pem
+*.key
+*.p12
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.envrc
+

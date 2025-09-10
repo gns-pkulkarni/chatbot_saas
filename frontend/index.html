@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chatbot SaaS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Login Button -->
+<button class="btn btn-outline-light position-absolute top-0 end-0 m-3" id="loginBtn" style="z-index: 1000;">Login</button>
+
+<!-- Toast Notifications -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Login successful! Redirecting...
+        </div>
+    </div>
+    <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="errorToastBody">
+            An error occurred.
+        </div>
+    </div>
+</div>
+
+<section class="hero">
+    <div class="container">
+        <h1 class="animate-fade-in">Transform Your Website with <span style="color: #fbbf24">AI Chatbot</span></h1>
+        <p class="animate-fade-in-delay">Your 24/7 virtual assistant. Enhance customer interaction effortlessly.</p>
+        <button class="btn btn-primary mt-4 animate-bounce" id="registerBtn">Get Started Free</button>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="animate-on-scroll">Simple & Powerful - Go Live in Minutes!</h2>
+            <p class="text-muted animate-on-scroll">1-Click Solution to Get Your AI Chatbot Running</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center animate-on-scroll">
+                    <div class="feature-icon mb-3">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-user-plus fa-3x"></i>
+                        </div>
+                    </div>
+                    <h4>1. Register</h4>
+                    <p class="text-muted">Create your account in seconds and choose your plan</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center animate-on-scroll" style="animation-delay: 0.1s">
+                    <div class="feature-icon mb-3">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-code fa-3x"></i>
+                        </div>
+                    </div>
+                    <h4>2. Get Embed Code</h4>
+                    <p class="text-muted">Generate your unique chatbot embed code instantly</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center animate-on-scroll" style="animation-delay: 0.2s">
+                    <div class="feature-icon mb-3">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-paste fa-3x"></i>
+                        </div>
+                    </div>
+                    <h4>3. Paste & Deploy</h4>
+                    <p class="text-muted">Works with WordPress, Wix, HTML sites and more</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center animate-on-scroll" style="animation-delay: 0.3s">
+                    <div class="feature-icon mb-3">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-rocket fa-3x"></i>
+                        </div>
+                    </div>
+                    <h4>4. Go Live!</h4>
+                    <p class="text-muted">Your AI chatbot is ready to assist visitors 24/7</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Visual Steps Section -->
+<section class="visual-steps py-5">
+    <div class="container">
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-7">
+                <div class="step-visual animate-on-scroll">
+                    <div class="browser-mockup">
+                        <div class="browser-header">
+                            <div class="browser-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <div class="browser-url">www.yourwebsite.com</div>
+                        </div>
+                        <div class="browser-content">
+                            <div class="website-preview">
+                                <div class="preview-header">Your Website</div>
+                                <div class="preview-content">
+                                    <div class="preview-text"></div>
+                                    <div class="preview-text short"></div>
+                                </div>
+                                <div class="chatbot-button">Add GNS AI</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <h3 class="mb-3 animate-on-scroll">Step 1: Get your embed code</h3>
+                <p class="text-muted animate-on-scroll">Enter your website address. GNS will analyze your site and generate an embed code for your chatbot.</p>
+            </div>
+        </div>
+
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-5 order-lg-1">
+                <h3 class="mb-3 animate-on-scroll">Step 2: Add the chatbot to your website</h3>
+                <p class="text-muted animate-on-scroll">Grab your embed code and drop it into your site. That's all GNS needs to get to work.</p>
+                <div class="platform-icons animate-on-scroll">
+                    <span class="platform-label">Works perfect on powerful platforms:</span>
+                    <div class="platforms">
+                        <div class="platform-icon">
+                            <i class="fab fa-wordpress"></i>
+                        </div>
+                        <div class="platform-icon">
+                            <i class="fab fa-wix"></i>
+                        </div>
+                        <div class="platform-icon">
+                            <i class="fab fa-html5"></i>
+                        </div>
+                        <div class="platform-more">more ...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 order-lg-2">
+                <div class="step-visual animate-on-scroll">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Embed Code</span>
+                            <button class="copy-btn">Copy</button>
+                        </div>
+                        <pre><code>&lt;script src="https://www.gnschatbotprovider.com/
+embed.js?id=0197a769e82171e397f8d01d9d
+8e3bbaf2cd"&gt;&lt;/script&gt;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="step-visual animate-on-scroll">
+                    <div class="chat-mockup">
+                        <div class="chat-header">
+                            <div class="chat-avatar"></div>
+                            <span>GNS AI</span>
+                            <div class="chat-notification">You have a new conversation!</div>
+                        </div>
+                        <div class="chat-body">
+                            <div class="chat-message bot">Hello! How can I help you today?</div>
+                            <div class="chat-message user">I need information about your services</div>
+                            <div class="chat-input">
+                                <input type="text" placeholder="Ask GNS AI..." />
+                                <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <h3 class="mb-3 animate-on-scroll">Step 3: Go live in minutes. It's free!</h3>
+                <p class="text-muted animate-on-scroll">GNS will chat with your site visitors and send conversations to your email inbox.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Knowledge Base Features -->
+<section class="knowledge-features py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="animate-on-scroll">Powerful Knowledge Base Management</h2>
+            <p class="text-muted animate-on-scroll">Add and remove your knowledge sources with ease</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="kb-feature-card animate-on-scroll">
+                    <div class="kb-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="kb-content">
+                        <h4>Website URLs</h4>
+                        <p>Add any website URL and let our AI learn from your content automatically</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="kb-feature-card animate-on-scroll" style="animation-delay: 0.1s">
+                    <div class="kb-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="kb-content">
+                        <h4>Document Uploads</h4>
+                        <p>Support for Text, Markdown, DOCX, and PDF files</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="plans" class="pricing">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Subscription Plans</h2>
+            <p>Select a plan that fits your business needs.</p>
+        </div>
+        <div class="row g-4" id="pricing-plans">
+            <!-- Plans will be dynamically added here -->
+        </div>
+    </div>
+</section>
+
+<!-- Modal for Registration/Login -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="authModalLabel">Register / Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="authForm">
+          <div class="mb-3" id="fullNameField">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="fullName" name="fullName" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <div class="mb-3" id="planField" style="display:none;">
+            <label for="planSelect" class="form-label">Select Plan</label>
+            <select class="form-select" id="planSelect" name="plan" required>
+              <option value="">Choose a plan...</option>
+            </select>
+            <small class="text-muted">You can upgrade your plan anytime from the dashboard</small>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </form>
+        <div class="text-center mt-3">
+          <p class="mb-0">
+            <span id="toggleText">Already have an account?</span>
+            <a href="#" id="toggleAuth" class="text-primary">Login</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/script.js"></script>
+</body>
+</html>
